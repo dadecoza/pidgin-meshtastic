@@ -11,6 +11,26 @@
 #define START_BYTE_1 0x94
 #define START_BYTE_2 0xc3
 
+// from libpurple internal.h
+#ifdef ENABLE_NLS
+#  include <locale.h>
+#  include <libintl.h>
+#  define _(String) ((const char *)dgettext(PACKAGE, String))
+#  ifdef gettext_noop
+#    define N_(String) gettext_noop (String)
+#  else
+#    define N_(String) (String)
+#  endif
+#else
+#  include <locale.h>
+#  define N_(String) (String)
+#  ifndef _
+#    define _(String) ((const char *)String)
+#  endif
+#  define ngettext(Singular, Plural, Number) ((Number == 1) ? ((const char *)Singular) : ((const char *)Plural))
+#  define dngettext(Domain, Singular, Plural, Number) ((Number == 1) ? ((const char *)Singular) : ((const char *)Plural))
+#endif
+
 enum connection_type {
   meshtastic_serial_connection,
   meshtastic_socket_connection

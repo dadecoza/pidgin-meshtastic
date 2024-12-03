@@ -40,8 +40,6 @@
 #include "mtstrings.h"
 #include "meshtastic.h"
 
-#include "internal.h"
-
 #define PROTO_NAME "meshtastic"
 
 static PurplePlugin *_mt_protocol = NULL;
