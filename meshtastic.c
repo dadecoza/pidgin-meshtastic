@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #else
+#include <winsock2.h>
 #include <windows.h>
 #endif
 

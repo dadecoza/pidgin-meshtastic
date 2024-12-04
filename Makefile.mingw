@@ -4,15 +4,15 @@
 
 include ./nanopb/extra/nanopb.mk
 
-CC := gcc
+CC ?= gcc
 C_FLAGS = -Wall -Werror -g -O2
 
 
 
 #  PIDGIN_TREE_TOP := ../pidgin-release-2.x.y
-PIDGIN_TREE_TOP := ../pidgin-v2.14.13
-GTK_TOP := ../win32-dev/gtk_2_0-2.14
-PURPLE_TOP := $(PIDGIN_TREE_TOP)/libpurple
+PIDGIN_TREE_TOP ?= ../pidgin-v2.14.13
+GTK_TOP ?= ../win32-dev/gtk_2_0-2.14
+PURPLE_TOP ?= $(PIDGIN_TREE_TOP)/libpurple
 
 ##
 ## INCLUDE PATHS
