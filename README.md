@@ -40,3 +40,12 @@ make -f Makefile.mingw
 * *Username*: this can be anything, your radio will update the username once connected
 * *COM port or IP address*: Typically "COMx" on Windows, or "/dev/ttyUSBx" on Linux. It can also be a valid IPv4 address for socket connections.
 * *Local Alias*: Can be left empty, it will populate on first connect.
+
+# Usage
+![Menus screenshot](https://dade.co.za/images/menus.png)
+* Right-click on a node and navigate to the "Meshtastic" menu item for Meshtastic-specific actions.
+* These actions will be applied to your local node (indicated by the blue flag) or any remote node where you have admin access.
+* A note on admin access: The legacy admin channel will take precedence over admin keys. This means that if you want to administer newer nodes with admin keys configured, you must ensure the admin channel is disabled or you will get the "no channel" error message.
+
+
+
