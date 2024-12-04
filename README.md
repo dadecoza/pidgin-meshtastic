@@ -16,6 +16,7 @@ NOTE: You need to have sources added to /etc/apt/sources.list. You either have t
 sudo apt-get update
 sudo apt-get build-dep pidgin
 git clone https://github.com/dadecoza/pidgin-meshtastic.git --recursive
+cd pidgin-meshtastic
 make
 ```
 Copy the library and pixmaps to the appropriate locations. The file locations might differ depending on your distro.
