@@ -33,3 +33,10 @@ make -f Makefile.mingw
 ```
  * Copy libmeshtastic.dll to C:\Program Files (x86)\Pidgin\Plugins
  * Copy the pixmaps directory to C:\Program Files (x86)\Pidgin
+
+# Adding the account
+![Account screenshot](https://dade.co.za/images/account.png)
+* *Protocol*: Meshtastic
+* *Username*: this can be anything, your radio will update the username once connected
+* *COM port or IP address*: Typically "COMx" on Windows, or "/dev/ttyUSBx" on Linux. It can also be a valid IPv4 address for socket connections.
+* *Local Alias*: Can be left empty, it will populate on first connect.
