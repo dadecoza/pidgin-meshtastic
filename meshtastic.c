@@ -40,8 +40,12 @@
 #include "mtstrings.h"
 #include "meshtastic.h"
 
-#define PROTO_NAME "meshtastic"
+#ifdef _WIN32
+#include <win32dep.h>
+#endif
 
+
+#define PROTO_NAME "meshtastic"
 static PurplePlugin *_mt_protocol = NULL;
 
 /**
