@@ -16,7 +16,7 @@ NOTE: You need to have sources added to /etc/apt/sources.list. You either have t
 
 ```shell
 sudo apt-get update
-sudo apt-get build-dep pidgin
+sudo apt-get install pidgin-dev git
 git clone https://github.com/dadecoza/pidgin-meshtastic.git --recursive
 cd pidgin-meshtastic
 make
