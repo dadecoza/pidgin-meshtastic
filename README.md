@@ -19,6 +19,7 @@ git clone https://github.com/dadecoza/pidgin-meshtastic.git --recursive
 cd pidgin-meshtastic
 make
 sudo make install
+sudo adduser $USER dialout
  ```
 
 ### Windows

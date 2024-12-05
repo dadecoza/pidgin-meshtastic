@@ -45,7 +45,6 @@
 #include <win32dep.h>
 #endif
 
-
 #define PROTO_NAME "meshtastic"
 static PurplePlugin *_mt_protocol = NULL;
 
@@ -97,7 +96,10 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
             return 1;
         }
 #else
-        mta->handle = CreateFileA(port, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+        char portbuf[20];
+        sprintf(portbuf, "\\\\.\\%s", port);
+        purple_debug_info(PROTO_NAME, "Creating Windows HANDLE to %s ...\n", portbuf);
+        mta->handle = CreateFileA(portbuf, GENERIC_READ | GENERIC_WRITE, 0, NULL,
                                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (mta->handle == INVALID_HANDLE_VALUE)
         {
@@ -115,10 +117,10 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
 
         // Configure read and write operations to time out after 100 ms.
         COMMTIMEOUTS timeouts = {0};
-        timeouts.ReadIntervalTimeout = 0;
-        timeouts.ReadTotalTimeoutConstant = 100;
+        timeouts.ReadIntervalTimeout = 10;
+        timeouts.ReadTotalTimeoutConstant = 0;
         timeouts.ReadTotalTimeoutMultiplier = 0;
-        timeouts.WriteTotalTimeoutConstant = 100;
+        timeouts.WriteTotalTimeoutConstant = 10;
         timeouts.WriteTotalTimeoutMultiplier = 0;
 
         success = SetCommTimeouts(mta->handle, &timeouts);
@@ -291,15 +293,19 @@ int mt_send_admin(MeshtasticAccount *mta, meshtastic_AdminMessage admin, int32_t
 // Request Data
 int mt_request_initial_config(MeshtasticAccount *mta)
 {
-    uint8_t buffer[32];
-    memset(buffer, START_BYTE_2, sizeof(buffer));
-    mt_write(mta, buffer, 32);
     int want_config_id = rand() % 0x7FffFFff;
     meshtastic_ToRadio toRadio = meshtastic_ToRadio_init_default;
     toRadio.which_payload_variant = meshtastic_ToRadio_want_config_id_tag;
     toRadio.want_config_id = want_config_id;
-    mt_send_to_radio(mta, toRadio);
-    return 1;
+    return mt_send_to_radio(mta, toRadio);
+}
+
+static gboolean mt_request_initial_config_timed(MeshtasticAccount *mta)
+{
+    int result;
+    result = mt_request_initial_config(mta);
+    purple_debug_info(PROTO_NAME, "Timed config request sent {%d}\n", result);
+    return FALSE;
 }
 
 int mt_request_session_key(MeshtasticAccount *mta, uint32_t dest)
@@ -3404,10 +3410,21 @@ static void mt_login(PurpleAccount *account)
         purple_connection_error_reason(gc, PURPLE_CONNECTION_ERROR_NETWORK_ERROR, "Failed to connect");
         return;
     }
-    mt_request_initial_config(mta);
+    if (connection_type == meshtastic_serial_connection)
+    {
+        uint8_t buffer[32];
+        memset(buffer, START_BYTE_2, sizeof(buffer));
+        mt_write(mta, buffer, 32);
+        purple_timeout_add(100, (GSourceFunc)mt_request_initial_config_timed, mta);
+    }
+    else
+    {
+        mt_request_initial_config(mta);
+    }
     mta->mt_status_update_timeout = purple_timeout_add_seconds(20, (GSourceFunc)mt_update_statusses, mta);
     mta->mt_heartbeat_timeout = purple_timeout_add_seconds(10, (GSourceFunc)mt_heartbeat, mta);
     mt_add_groups(mta);
+    purple_debug_info(PROTO_NAME, "Successfully connected to %s\n", port);
     purple_connection_set_state(gc, PURPLE_CONNECTED);
 }
 
@@ -3496,7 +3513,8 @@ static void mt_get_info(PurpleConnection *gc, const char *username)
     if (!mb)
         return;
 
-    if (mb->id == mta->id) {
+    if (mb->id == mta->id)
+    {
         purple_notify_user_info_prepend_pair(user_info, g_strdup("Firmware version"), g_strdup_printf("%s", mta->metadata->firmware_version));
     }
     purple_notify_user_info_prepend_pair(user_info, g_strdup("ID"), g_strdup_printf("%u", mb->id));

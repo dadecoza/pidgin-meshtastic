@@ -1,11 +1,5 @@
 #include "mtstrings.h"
 
-typedef struct
-{
-    int id;
-    char name[40];
-} region;
-
 const char *mt_lookup_hw(meshtastic_HardwareModel model)
 {
     switch (model)
