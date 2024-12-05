@@ -12,8 +12,6 @@ Precompiled libraries for Windows and Linux can be found under [releases](https:
 ## Build
 
 ### Debian
-NOTE: You need to have sources added to /etc/apt/sources.list. You either have to uncomment or add the deb-src entry.
-
 ```shell
 sudo apt-get update
 sudo apt-get install pidgin-dev git
