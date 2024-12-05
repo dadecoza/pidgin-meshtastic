@@ -4,7 +4,9 @@
 
 Make sure you already have [Pidgin](https://pidgin.im/install/) installed.
 
-The Windows installer for the plugin is available under the [latest release](https://github.com/dadecoza/pidgin-meshtastic/releases/).
+The Windows installer for the plugin is available [here](https://github.com/dadecoza/pidgin-meshtastic/releases/download/v0.1.0-alpha/pidgin-meshtastic-0.1.0-alpha.exe).
+
+Precompiled libraries for Windows and Linux can be found under [releases](https://github.com/dadecoza/pidgin-meshtastic/releases).
 
 
 ## Build
@@ -18,11 +20,7 @@ sudo apt-get build-dep pidgin
 git clone https://github.com/dadecoza/pidgin-meshtastic.git --recursive
 cd pidgin-meshtastic
 make
-```
-Copy the library and pixmaps to the appropriate locations. The file locations might differ depending on your distro.
- ```shell
-sudo cp libmeshtastic.so /usr/lib/purple-2
-sudo cp -r pixmaps /usr/share
+sudo make install
  ```
 
 ### Windows
