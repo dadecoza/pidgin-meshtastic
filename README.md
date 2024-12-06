@@ -9,7 +9,7 @@ The Windows installer for the plugin is available [here](https://github.com/dade
 Precompiled libraries for Windows and Linux can be found under [releases](https://github.com/dadecoza/pidgin-meshtastic/releases).
 
 
-## Build
+## Installation
 
 ### Debian
 ```shell
@@ -22,15 +22,11 @@ sudo make install
 sudo adduser $USER dialout
  ```
 
+### Arch
+[AUR Package](https://aur.archlinux.org/packages/pidgin-meshtastic-git) (Thanks [timttmy](https://github.com/timttmy))
+
 ### Windows
-Follow the [Pidgin for Windows Build Instructions](https://developer.pidgin.im/wiki/BuildingWinPidgin.html) and navigate to $PIDGIN_DEV_ROOT .
-```shell
-git clone https://github.com/dadecoza/pidgin-meshtastic.git --recursive
-cd pidgin-meshtastic
-make -f Makefile.mingw
-```
- * Copy libmeshtastic.dll to C:\Program Files (x86)\Pidgin\Plugins
- * Copy the pixmaps directory to C:\Program Files (x86)\Pidgin
+[Windows Installer](https://github.com/dadecoza/pidgin-meshtastic/releases/download/v0.1.0-alpha/pidgin-meshtastic-0.1.0-alpha.exe)
 
 # Adding the account
 ![Account screenshot](https://dade.co.za/images/account.png)
