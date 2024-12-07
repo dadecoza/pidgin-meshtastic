@@ -19,7 +19,7 @@ jobs:
       - name: Set up MinGW
         run: |
           sudo apt update
-          sudo apt install -y gcc-mingw-w64-i686-win32
+          sudo apt install -y gcc-mingw-w64-i686-win32 nsis nsis-common
 
       - name: Load Pidgin from cache
         id: pidgin-cache
@@ -65,12 +65,18 @@ jobs:
           export GTK_TOP=win32-dev/glib-2.28.8
           make -f Makefile.mingw
 
+      - name: Create NSIS Installer
+        run: |
+          makensis nsis/pidgin-meshtastic-installer.nsi
+
       - name: archive
         if: ${{ !env.ACT }}
         uses: actions/upload-artifact@v4
         with: 
             name: plugin 
-            path: lib*.dll
+            path: |
+              lib*.dll
+              pidgin-meshtastic-plugin.exe
 
       - name: release
         if: ${{ !env.ACT }}
@@ -86,4 +92,6 @@ jobs:
         if: ${{ !env.ACT }}
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: lib*.dll
+          subject-path: |
+            lib*.dll
+            pidgin-meshtastic-plugin.exe

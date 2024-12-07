@@ -30,7 +30,7 @@
 ; MUI end ------
 Icon "pidgin-meshtastic.ico"
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "pidgin-meshtastic-${PRODUCT_VERSION}.exe"
+OutFile "..\pidgin-meshtastic-plugin.exe"
 InstallDir "$PROGRAMFILES\Pidgin"
 ShowInstDetails show
 
