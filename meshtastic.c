@@ -117,7 +117,7 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
 
         // Configure read and write operations to time out after 100 ms.
         COMMTIMEOUTS timeouts = {0};
-        timeouts.ReadIntervalTimeout = 10;
+        timeouts.ReadIntervalTimeout = MAXDWORD;
         timeouts.ReadTotalTimeoutConstant = 0;
         timeouts.ReadTotalTimeoutMultiplier = 0;
         timeouts.WriteTotalTimeoutConstant = 10;
@@ -140,6 +140,13 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
         if (!success)
         {
             purple_debug_error(PROTO_NAME, "Failed to configure serial port\n");
+            CloseHandle(mta->handle);
+            return 1;
+        }
+        success = FlushFileBuffers(mta->handle);
+        if (!success)
+        {
+            purple_debug_error(PROTO_NAME, "Failed to flush handle buffers\n");
             CloseHandle(mta->handle);
             return 1;
         }
