@@ -82,7 +82,7 @@ jobs:
         if: ${{ !env.ACT }}
         uses: ncipollo/release-action@v1
         with:
-          artifacts: lib*.dll
+          artifacts: "lib*.dll,pidgin-meshtastic-plugin.exe"
           tag: nightly-${{ github.sha }}
           name: Nightly ${{ github.sha }}
           allowUpdates: true
