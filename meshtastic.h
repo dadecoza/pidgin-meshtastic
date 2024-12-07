@@ -31,6 +31,10 @@
 #  define dngettext(Domain, Singular, Plural, Number) ((Number == 1) ? ((const char *)Singular) : ((const char *)Plural))
 #endif
 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 enum connection_type {
   meshtastic_serial_connection,
   meshtastic_socket_connection

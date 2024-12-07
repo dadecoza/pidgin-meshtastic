@@ -118,9 +118,9 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
         // Configure read and write operations to time out after 100 ms.
         COMMTIMEOUTS timeouts = {0};
         timeouts.ReadIntervalTimeout = MAXDWORD;
-        timeouts.ReadTotalTimeoutConstant = 0;
+        timeouts.ReadTotalTimeoutConstant = 100;
         timeouts.ReadTotalTimeoutMultiplier = 0;
-        timeouts.WriteTotalTimeoutConstant = 10;
+        timeouts.WriteTotalTimeoutConstant = 100;
         timeouts.WriteTotalTimeoutMultiplier = 0;
 
         success = SetCommTimeouts(mta->handle, &timeouts);
