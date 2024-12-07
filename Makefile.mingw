@@ -5,8 +5,7 @@
 include ./nanopb/extra/nanopb.mk
 
 CC ?= gcc
-C_FLAGS = -Wall -Werror -g -O2 -std=c99
-
+C_FLAGS = -Wall -Werror -g -O0 -static-libgcc -lm -std=c99
 
 #  PIDGIN_TREE_TOP := ../pidgin-release-2.x.y
 PIDGIN_TREE_TOP ?= ../pidgin-v2.14.13
