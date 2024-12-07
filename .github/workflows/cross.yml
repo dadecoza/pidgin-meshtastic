@@ -76,13 +76,13 @@ jobs:
             name: plugin 
             path: |
               lib*.dll
-              pidgin-meshtastic-plugin.exe
+              pidgin-meshtastic-setup.exe
 
       - name: release
         if: ${{ !env.ACT }}
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "lib*.dll,pidgin-meshtastic-plugin.exe"
+          artifacts: "lib*.dll,pidgin-meshtastic-setup.exe"
           tag: nightly-${{ github.sha }}
           name: Nightly ${{ github.sha }}
           allowUpdates: true
@@ -94,4 +94,4 @@ jobs:
         with:
           subject-path: |
             lib*.dll
-            pidgin-meshtastic-plugin.exe
+            pidgin-meshtastic-setup.exe
