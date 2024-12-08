@@ -4,7 +4,7 @@
 
 Make sure you already have [Pidgin](https://pidgin.im/install/) installed.
 
-The Windows installer for the plugin is available [here](https://dade.co.za/pidgin-meshtastic-0.1.3-alpha.exe).
+The Windows installer for the plugin is available [here](https://dade.co.za/pidgin-meshtastic-setup.exe).
 
 Precompiled libraries for Windows and Linux can be found under [releases](https://github.com/dadecoza/pidgin-meshtastic/releases).
 
@@ -26,7 +26,7 @@ sudo adduser $USER dialout
 [AUR Package](https://aur.archlinux.org/packages/pidgin-meshtastic-git) (Thanks [timttmy](https://github.com/timttmy))
 
 ### Windows
-[Windows Installer](https://dade.co.za/pidgin-meshtastic-0.1.3-alpha.exe)
+[Windows Installer](pidgin-meshtastic-setup.exe)
 
 # Adding the account
 ![Account screenshot](https://dade.co.za/images/account.png)
