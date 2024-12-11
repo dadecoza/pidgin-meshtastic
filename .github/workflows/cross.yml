@@ -67,6 +67,7 @@ jobs:
 
       - name: Create NSIS Installer
         run: |
+          sed -i -e "s/~SHA~/${{ github.sha }}/g" nsis/pidgin-meshtastic-installer.nsi
           makensis nsis/pidgin-meshtastic-installer.nsi
 
       - name: archive

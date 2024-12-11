@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Pidgin Meshtastic Plugin"
-!define PRODUCT_VERSION "0.1.0-alpha"
+!define PRODUCT_VERSION "nightly-~SHA~"
 !define PRODUCT_PUBLISHER "dadecoza"
 !define PRODUCT_WEB_SITE "https://github.com/dadecoza/pidgin-meshtastic"
 
