@@ -482,6 +482,18 @@ int mt_set_security_config(MeshtasticAccount *mta, uint32_t dest, meshtastic_Con
     return mt_send_admin(mta, admin_message, dest, true);
 }
 
+int mt_set_power_config(MeshtasticAccount *mta, uint32_t dest, meshtastic_Config_PowerConfig power)
+{
+    meshtastic_AdminMessage admin_message = meshtastic_AdminMessage_init_default;
+    meshtastic_Config config = meshtastic_Config_init_default;
+    admin_message.which_payload_variant = meshtastic_AdminMessage_set_config_tag;
+    admin_message.session_passkey = *mta->session_passkey;
+    config.which_payload_variant = meshtastic_Config_power_tag;
+    config.payload_variant.power = power;
+    admin_message.set_config = config;
+    return mt_send_admin(mta, admin_message, dest, true);
+}
+
 int mt_set_mqtt_module_config(MeshtasticAccount *mta, uint32_t dest, meshtastic_ModuleConfig_MQTTConfig mqtt)
 {
     meshtastic_AdminMessage admin_message = meshtastic_AdminMessage_init_default;
@@ -2289,6 +2301,120 @@ void mt_request_security_config(MeshtasticAccount *mta, PurpleBuddy *buddy, mesh
     );
 }
 
+// Power Config
+void mt_save_power_config(MeshtasticConfigFields *cf)
+{
+    meshtastic_Config *config = cf->config;
+    MeshtasticBuddy *mb;
+
+    float tempf;
+    unsigned int tempi;
+    char buffer[100];
+
+    // Is Power Saving
+    config->payload_variant.power.is_power_saving = purple_request_fields_get_bool(cf->fields, "is_power_saving");
+
+    // On Battery Shutdown After Secs
+    config->payload_variant.power.on_battery_shutdown_after_secs = purple_request_fields_get_integer(cf->fields, "on_battery_shutdown_after_secs");
+
+    // ADC Multiplier Override
+    strcpy(buffer, purple_request_fields_get_string(cf->fields, "adc_multiplier_override"));
+    sscanf(buffer, " %f ", &tempf);
+    config->payload_variant.power.adc_multiplier_override = tempf;
+
+    // Wait Bluetooth Secs
+    config->payload_variant.power.wait_bluetooth_secs = purple_request_fields_get_integer(cf->fields, "wait_bluetooth_secs");
+
+    // Light Sleep Interval
+    config->payload_variant.power.ls_secs = purple_request_fields_get_integer(cf->fields, "ls_secs");
+
+    // Minimum Wake Interval
+    config->payload_variant.power.min_wake_secs = purple_request_fields_get_integer(cf->fields, "min_wake_secs");
+
+    // Device Battery INA2xx Address
+    strcpy(buffer, purple_request_fields_get_string(cf->fields, "device_battery_ina_address"));
+    sscanf(buffer, " %x ", &tempi);
+    config->payload_variant.power.device_battery_ina_address = tempi;
+
+    mb = cf->buddy->proto_data;
+    cf->mta->cb_routing = &mt_acknowledge_cb;
+    mt_set_power_config(cf->mta, mb->id, config->payload_variant.power);
+    g_free(cf->config);
+    g_free(cf);
+}
+
+void mt_request_power_config(MeshtasticAccount *mta, PurpleBuddy *buddy, meshtastic_Config config)
+{
+    PurpleRequestFields *fields = purple_request_fields_new();
+    PurpleRequestFieldGroup *group = purple_request_field_group_new(NULL);
+    PurpleRequestField *is_power_saving;
+    PurpleRequestField *on_battery_shutdown_after_secs;
+    PurpleRequestField *adc_multiplier_override;
+    PurpleRequestField *wait_bluetooth_secs;
+    PurpleRequestField *ls_secs;
+    PurpleRequestField *min_wake_secs;
+    PurpleRequestField *device_battery_ina_address;
+    MeshtasticConfigFields *conf;
+    meshtastic_Config *con;
+    char buffer[100];
+
+    // Is Power Saving
+    is_power_saving = purple_request_field_bool_new("is_power_saving", g_strdup("Power saving enabled"), config.payload_variant.power.is_power_saving);
+    purple_request_field_group_add_field(group, is_power_saving);
+
+    // On Battery Shutdown After Secs
+    on_battery_shutdown_after_secs = purple_request_field_int_new("on_battery_shutdown_after_secs", g_strdup("Shutdown after how many seconds on battery power"), config.payload_variant.power.on_battery_shutdown_after_secs);
+    purple_request_field_group_add_field(group, on_battery_shutdown_after_secs);
+
+    // ADC Multiplier Override
+    sprintf(buffer, "%.2f", config.payload_variant.power.adc_multiplier_override);
+    adc_multiplier_override = purple_request_field_string_new("adc_multiplier_override", g_strdup("ADC multiplier override"), buffer, FALSE);
+    purple_request_field_group_add_field(group, adc_multiplier_override);
+
+    // Wait Bluetooth Secs
+    wait_bluetooth_secs = purple_request_field_int_new("wait_bluetooth_secs", g_strdup("How long before turning off bluetooth (seconds)"), config.payload_variant.power.wait_bluetooth_secs);
+    purple_request_field_group_add_field(group, wait_bluetooth_secs);
+
+    // Light Sleep Interval
+    ls_secs = purple_request_field_int_new("ls_secs", g_strdup("How long before light sleep (seconds)"), config.payload_variant.power.ls_secs);
+    purple_request_field_group_add_field(group, ls_secs);
+
+    // Minimum Wake Interval
+    min_wake_secs = purple_request_field_int_new("min_wake_secs", g_strdup("How long to stay awake after activity (seconds)"), config.payload_variant.power.min_wake_secs);
+    purple_request_field_group_add_field(group, min_wake_secs);
+
+    // Device Battery INA2xx Address
+    sprintf(buffer, "%x", config.payload_variant.power.device_battery_ina_address);
+    device_battery_ina_address = purple_request_field_string_new("device_battery_ina_address", g_strdup("INA-2XX I2C address"), buffer, FALSE);
+    purple_request_field_group_add_field(group, device_battery_ina_address);
+
+    purple_request_fields_add_group(fields, group);
+
+    conf = g_new0(MeshtasticConfigFields, 1);
+    con = g_new0(meshtastic_Config, 1);
+    memcpy(con, &config, sizeof(meshtastic_Config));
+    conf->mta = mta;
+    conf->fields = fields;
+    conf->buddy = buddy;
+    conf->config = con;
+
+    purple_request_fields(
+        mta->gc,                         // void *handle,
+        buddy->alias,                    // const char *title,
+        g_strdup("Power Configuration"), // const char *primary,
+        buddy->alias,
+        fields,                           // PurpleRequestFields *fields,
+        g_strdup("Save"),                 // const char *ok_text,
+        G_CALLBACK(mt_save_power_config), // GCallback ok_cb,
+        g_strdup("Cancel"),               // const char *cancel_text,
+        G_CALLBACK(mt_cancel_cb),         // GCallback cancel_cb,
+        mta->account,                     // PurpleAccount *account,
+        NULL,                             // const char *who,
+        NULL,                             // PurpleConversation *conv,
+        conf                              // void *user_data
+    );
+}
+
 // Fixed Position
 void mt_save_fixed_position(MeshtasticConfigFields *cf)
 {
@@ -2798,6 +2924,19 @@ static void mt_security_config_received(MeshtasticAccount *mta, meshtastic_MeshP
     mta->cb_data = NULL;
 }
 
+static void mt_power_config_received(MeshtasticAccount *mta, meshtastic_MeshPacket *packet)
+{
+    PurpleBuddy *buddy;
+    pb_istream_t stream;
+    meshtastic_AdminMessage admin = meshtastic_AdminMessage_init_default;
+    stream = pb_istream_from_buffer(packet->decoded.payload.bytes, packet->decoded.payload.size);
+    pb_decode(&stream, meshtastic_AdminMessage_fields, &admin);
+    buddy = (PurpleBuddy *)mta->cb_data;
+    mt_request_power_config(mta, buddy, admin.get_config_response);
+    mta->cb_config = NULL;
+    mta->cb_data = NULL;
+}
+
 static void mt_mqtt_module_received(MeshtasticAccount *mta, meshtastic_MeshPacket *packet)
 {
     PurpleBuddy *buddy;
@@ -3043,6 +3182,15 @@ static void mt_security_config_menu_item(PurpleBlistNode *node, gpointer userdat
         mt_security_config_received);
 }
 
+static void mt_power_config_menu_item(PurpleBlistNode *node, gpointer userdata)
+{
+    mt_config_menu_item(
+        node,
+        userdata,
+        meshtastic_AdminMessage_ConfigType_POWER_CONFIG,
+        mt_power_config_received);
+}
+
 static void mt_mqtt_module_menu_item(PurpleBlistNode *node, gpointer userdata)
 {
     mt_module_menu_item(
@@ -3278,6 +3426,7 @@ static GList *mt_blist_node_menu(PurpleBlistNode *node)
         config_items = g_list_append(config_items, purple_menu_action_new("Networking", PURPLE_CALLBACK(mt_network_config_menu_item), NULL, NULL));
         config_items = g_list_append(config_items, purple_menu_action_new("Bluetooth", PURPLE_CALLBACK(mt_bluetooth_config_menu_item), NULL, NULL));
         config_items = g_list_append(config_items, purple_menu_action_new("Security", PURPLE_CALLBACK(mt_security_config_menu_item), NULL, NULL));
+        config_items = g_list_append(config_items, purple_menu_action_new("Power", PURPLE_CALLBACK(mt_power_config_menu_item), NULL, NULL));
         module_items = g_list_append(module_items, purple_menu_action_new("MQTT", PURPLE_CALLBACK(mt_mqtt_module_menu_item), NULL, NULL));
         items = g_list_append(items, purple_menu_action_new("Channels", NULL, NULL, channel_items));
         items = g_list_append(items, purple_menu_action_new("Config", NULL, NULL, config_items));
@@ -3818,26 +3967,26 @@ static PurplePluginInfo info = {
     */
     2,
     1,
-    PURPLE_PLUGIN_PROTOCOL,               /* type */
-    NULL,                                 /* ui_requirement */
-    0,                                    /* flags */
-    NULL,                                 /* dependencies */
-    PURPLE_PRIORITY_DEFAULT,              /* priority */
-    "prpl-dadecoza-meshtastic",           /* id */
-    "Meshtastic",                         /* name */
-    "1.0",                                /* version */
-    "Meshtastic Plugin",                  /* summary */
-    "Meshtastic Plugin",                  /* description */
-    "Johannes Le Roux <dade@dade.co.za>", /* author */
-    "",                                   /* homepage */
-    plugin_load,                          /* load */
-    plugin_unload,                        /* unload */
-    NULL,                                 /* destroy */
-    NULL,                                 /* ui_info */
-    &prpl_info,                           /* extra_info */
-    NULL,                                 /* prefs_info */
-    NULL /*plugin_actions*/,              /* actions */
-    NULL,                                 /* padding */
+    PURPLE_PLUGIN_PROTOCOL,                          /* type */
+    NULL,                                            /* ui_requirement */
+    0,                                               /* flags */
+    NULL,                                            /* dependencies */
+    PURPLE_PRIORITY_DEFAULT,                         /* priority */
+    "prpl-dadecoza-meshtastic",                      /* id */
+    "Meshtastic",                                    /* name */
+    "0.1.5-alpha",                                   /* version */
+    "Meshtastic Plugin",                             /* summary */
+    "Meshtastic Plugin",                             /* description */
+    "Johannes Le Roux <dade@dade.co.za>",            /* author */
+    "https://github.com/dadecoza/pidgin-meshtastic", /* homepage */
+    plugin_load,                                     /* load */
+    plugin_unload,                                   /* unload */
+    NULL,                                            /* destroy */
+    NULL,                                            /* ui_info */
+    &prpl_info,                                      /* extra_info */
+    NULL,                                            /* prefs_info */
+    NULL /*plugin_actions*/,                         /* actions */
+    NULL,                                            /* padding */
     NULL,
     NULL,
     NULL,
