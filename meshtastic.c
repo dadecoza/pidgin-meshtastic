@@ -633,7 +633,7 @@ void seconds_to_days_str(uint32_t seconds, char *buffer)
     if (hours > 0)
         g_string_append_printf(str, "%d hours, ", hours);
     if (minutes > 0)
-        g_string_append_printf(str, "%d miutes, ", minutes);
+        g_string_append_printf(str, "%d minutes, ", minutes);
     if (seconds > 0)
         g_string_append_printf(str, "%d seconds ", seconds);
     strcpy(buffer, str->str);
