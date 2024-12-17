@@ -131,6 +131,13 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
             return 1;
         }
         DCB state = {0};
+        success = GetCommState(mta->handle, &state);
+        if (!success)
+        {
+            purple_debug_error(PROTO_NAME, "Failed to get port state\n");
+            CloseHandle(mta->handle);
+            return 1;
+        }
         state.DCBlength = sizeof(DCB);
         state.BaudRate = 115200;
         state.ByteSize = 8;
