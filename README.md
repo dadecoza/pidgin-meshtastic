@@ -4,7 +4,7 @@
 
 Make sure you already have [Pidgin](https://pidgin.im/install/) installed.
 
-The Windows installer for the plugin is available [here](https://github.com/dadecoza/pidgin-meshtastic/releases/latest/download/pidgin-meshtastic-setup.exe.)
+The Windows installer for the plugin is available [here](https://github.com/dadecoza/pidgin-meshtastic/releases/latest/download/pidgin-meshtastic-setup.exe).
 
 Precompiled libraries for Windows and Linux can be found under [releases](https://github.com/dadecoza/pidgin-meshtastic/releases).
 
