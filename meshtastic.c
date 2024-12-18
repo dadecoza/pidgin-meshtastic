@@ -139,6 +139,8 @@ int mt_connect(MeshtasticAccount *mta, char *port, enum connection_type type)
             return 1;
         }
         state.DCBlength = sizeof(DCB);
+        state.fRtsControl = RTS_CONTROL_ENABLE;
+        state.fDtrControl = DTR_CONTROL_ENABLE;
         state.BaudRate = 115200;
         state.ByteSize = 8;
         state.Parity = NOPARITY;
